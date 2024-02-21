@@ -5,6 +5,10 @@ function App() {
 
   const [personData ,setPersondata] = useState([])
 
+  const [indexUpdate ,setindexUpdate] =useState(null)
+
+  const [search ,setSearch] =useState('')
+
   const [person ,setPerson] = useState({
     id: Date.now(),
     name:'',
@@ -22,14 +26,32 @@ function App() {
   // useEffect(()=>{console.log(person)},[person])
 
 
+  const onSearch = (e)=>{
+    setSearch(e.target.value)
+  }
+
 
 
   const add =()=>{  
-    setPersondata([...personData ,person])
-    setPerson({
-      name:'',
-      age:''
-    })
+    if(indexUpdate === null){
+      setPersondata([...personData ,person])
+      setPerson({
+        name:'',
+        age:''
+      })
+    }else{
+
+      const newdata = [...personData]
+      newdata[indexUpdate] = person 
+      setindexUpdate(null)
+      setPersondata(newdata)
+      setPerson({
+        name:'',
+        age:''
+      })
+
+    }
+
   }
 
 
@@ -44,6 +66,15 @@ function App() {
   }
 
 
+  const update = (index)=>{
+
+    setPerson(personData[index])
+    setindexUpdate(index)
+  }
+
+
+
+
 
 
 
@@ -51,18 +82,21 @@ function App() {
     <form>
       <input type="text" name="name" value={person.name} onChange={(e)=>{handelChange(e)}}  placeholder="name"/>
       <input type="text" name="age" value={person.age}  onChange={(e)=>{handelChange(e)}} placeholder="age" />
-      <button  type="button" onClick={add}>add</button>
+      <button  type="button" onClick={add} >{ indexUpdate == null ? 'add' : 'update'}</button>
     </form>
+
+    <input type="text" name="search" onChange={(e)=>{onSearch(e)}} placeholder="search"  />
 
     <div className="persons">
       {
-        personData.map((person,index) => {
+        personData.filter(person => person.name.toLowerCase().includes(search.toLowerCase()) )
+        .map((person,index) => {
           return <div className="person">
             <p>{person.id}</p>
             <p>{person.name}</p>
             <p>{person.age}</p>
             <button onClick={()=>{Delete(index)}}>delete</button>
-            <button>update</button>
+            <button onClick={()=>{update(index)}}>update</button>
           </div>
         })
       }
